@@ -1,0 +1,28 @@
+
+syntax = "proto3";
+
+
+package transactions;
+
+
+service Transactor {
+    rpc GetTransactions (TransactionsRequest) returns (stream TransactionsReply) {}
+}
+
+message Transactions {
+    string date = 1;
+    string description = 2;
+    string amount = 3;
+
+}
+
+message TransactionsRequest {
+    string account = 1;
+    string branch = 2;
+}
+
+
+message TransactionsReply {
+    string id = 1;
+    Transactions transactions = 2;
+}
