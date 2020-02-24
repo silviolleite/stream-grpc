@@ -6,13 +6,14 @@ package transactions;
 
 
 service Transactor {
-    rpc GetTransactions (TransactionsRequest) returns (stream TransactionsReply) {}
+    rpc GetTransactions (TransactionsRequest) returns (TransactionsReply) {}
 }
 
 message Transactions {
-    string date = 1;
-    string description = 2;
-    string amount = 3;
+    string id = 1;
+    string date = 2;
+    string description = 3;
+    string amount = 4;
 
 }
 
@@ -23,6 +24,5 @@ message TransactionsRequest {
 
 
 message TransactionsReply {
-    string id = 1;
-    Transactions transactions = 2;
+    repeated Transactions transactions = 2;
 }
