@@ -16,7 +16,7 @@ See the definition of the service in transactions/transactions.proto.
 
 # Dependencies
 
-###Kafka
+### Kafka
 
 Install `landoop/fast-data-dev`
 
