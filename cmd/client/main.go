@@ -49,7 +49,5 @@ func main() {
 			log.Fatalf("%v.GetTransactions(_) = _, %v", c, err)
 		}
 		log.Println(data)
-		//log.Printf("ID: %s | date: %s | description: %s | amount: %s\n", data.Transactions.Id, data.Transactions.Date, data.Transactions.Description, data.Transactions.Amount)
-
 	}
 }
