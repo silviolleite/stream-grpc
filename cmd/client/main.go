@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"google.golang.org/grpc"
-	pb "stream/transactions"
+	pb "stream-grpc/transactions"
 )
 
 const (
@@ -48,7 +48,8 @@ func main() {
 		if err != nil {
 			log.Fatalf("%v.GetTransactions(_) = _, %v", c, err)
 		}
-		log.Printf("ID: %s | date: %s | description: %s | amount: %s\n", data.Id, data.Transactions.Date, data.Transactions.Description, data.Transactions.Amount)
+		log.Println(data)
+		//log.Printf("ID: %s | date: %s | description: %s | amount: %s\n", data.Transactions.Id, data.Transactions.Date, data.Transactions.Description, data.Transactions.Amount)
 
 	}
 }
