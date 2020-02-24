@@ -14,7 +14,17 @@ See the definition of the service in transactions/transactions.proto.
 
 --------
 
+### Environment variables
+
+We use [dotenv](https://github.com/joho/godotenv) to configure the application. All documentation for the project environment variables are located in `.env.example`.
+
+Create a copy of `.env.example` renaming it to `.env` and fill the environment variables according to documentation. Check this file for detailed instructions.
+
 # Dependencies
+
+### SQlite
+
+You must create a new empty file `sqlite.db` in the root of the project or create a file with another name and set it on environment variable `SQLITE_PATH` in `.env`. 
 
 ### Kafka
 
