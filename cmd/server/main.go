@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"stream-grpc/config"
 	"stream-grpc/models"
 	pb "stream-grpc/transactions"
 )
@@ -53,7 +54,7 @@ func main() {
 
 
 func GetTransactionsOnDB() pb.TransactionsReply {
-	db, err := gorm.Open("sqlite3", "sqlite.db")
+	db, err := gorm.Open("sqlite3", config.Config.SqlitePath)
 	if err != nil {
 		fmt.Println("Error to connect with database")
 		fmt.Printf("Error: %v\n", err)
