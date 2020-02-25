@@ -1,11 +1,14 @@
-Example of use gRPC with golang
+Microservices with gRPC with golang
 ===================================================
 
-The server and client demonstrate:
- - how to use grpc go libraries.
- - How to create a Kafka Producer and Consumer 
+It is an example of the microservices created using Event Sourcing and CQRS. The services are written in Golang. It is using [Apache Kafka](https://kafka.apache.org/) and [gRPC](https://grpc.io/) endpoints.
 
-See the definition of the service in transactions/transactions.proto.
+**The server and client demonstrate:**
+ - Connect services with gRPC
+ - gRPC Services definitions are in `transactions/transactions.proto`.
+ 
+**The procuder and consumer demonstrate:**
+ - Asynchronous communications with kafka flow
 
 
 ## Services architecture
@@ -21,6 +24,42 @@ We use [dotenv](https://github.com/joho/godotenv) to configure the application. 
 Create a copy of `.env.example` renaming it to `.env` and fill the environment variables according to documentation. Check this file for detailed instructions.
 
 # Dependencies
+
+### gRPC
+
+Package [grpc](https://godoc.org/google.golang.org/grpc) implements an RPC system called gRPC.
+
+### Kafka-go
+
+It provides both low and high level APIs for interacting with Kafka, mirroring concepts and implementing interfaces of the Go standard library to make it easy to use and integrate with existing software.
+[kafka-go](github.com/segmentio/kafka-go)
+
+### GORM
+
+[GORM](https://gorm.io/) is fantastic ORM library for Golang.
+
+
+### Proto-lens
+
+API for protocol buffers using modern Haskell language and library patterns.
+
+**Installing protoc**
+
+In order to build Haskell packages with proto-lens, the Google protobuf compiler (which is a standalone binary named protoc) needs to be installed. 
+
+You can see how to install it in [http://google.github.io/proto-lens/installing-protoc.html](http://google.github.io/proto-lens/installing-protoc.html)
+
+**Generating the Classes**
+
+Once the software is installed, there are the steps to using it. First you must compile the protocol buffer definitions and then import them, with the support library, into your program.
+
+To compile the protocol buffer definition, run protoc with the `--go_out` parameter set to the directory you want to output the Go code to.
+
+In our case is:
+```sh
+protoc -I transactions --go_out=plugins=grpc:transactions transactions/transactions.proto
+```
+The generated files will be suffixed `.pb.go` on `transactions` folder.
 
 ### SQlite
 
