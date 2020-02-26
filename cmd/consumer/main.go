@@ -22,7 +22,7 @@ func main() {
 
 	err = c.SubscribeTopics([]string{"transactions", "^aRegex.*[Tt]opic"}, nil)
 	if err != nil {
-		fmt.Printf("Error on subscribe topics: %v\n", err)
+		fmt.Printf("Error subscribing to topic: %v\n", err)
 	}
 	defer c.Close()
 

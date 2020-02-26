@@ -7,12 +7,6 @@ import (
 )
 
 func main() {
-//	brocker := fmt.Sprintf("%s:%s", config.Config.BrockerUrl, config.Config.BrockerPort)
-//	w := kafka.NewWriter(kafka.WriterConfig{
-//		Brokers: []string{brocker},
-//		Topic:   config.Config.Topic,
-//		Balancer: &kafka.LeastBytes{},
-//	})
 	transactions := []byte(`{
 		"transactions": [
 			{
@@ -34,25 +28,6 @@ func main() {
 				"amount": "1400"
 			}
 	]}`)
-//
-//	message := kafka.Message{
-//		Key:   []byte("transactions"),
-//		Value: transactions,
-//		Time:  time.Now(),
-//	}
-//	err := w.WriteMessages(context.Background(), message)
-//	if err != nil {
-//		fmt.Println("Error to push a new message")
-//		fmt.Printf("Error: %v\n", err)
-//	}else {
-//		fmt.Println("Message was published")
-//	}
-//
-//	err = w.Close()
-//	if err != nil {
-//		fmt.Println("Error on Close writer")
-//		fmt.Printf("Error: %v\n", err)
-//	}
 
 	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": config.Config.BrockerUrl})
 	if err != nil {
@@ -83,7 +58,7 @@ func main() {
 		Value:          transactions,
 	}, nil)
 	if err != nil {
-		fmt.Printf("Produce error: %v\n", err)
+		fmt.Printf("Message could not be enqueued: %v\n", err)
 	}
 
 	// Wait for message deliveries before shutting down
