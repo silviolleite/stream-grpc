@@ -1,4 +1,4 @@
-Microservices with gRPC with golang
+Examples of microservices using Apache Kafka and gRPC with Golang
 ===================================================
 
 It is an example of the microservices created using Event Sourcing and CQRS. The services are written in Golang. It is using [Apache Kafka](https://kafka.apache.org/) and [gRPC](https://grpc.io/) endpoints.
