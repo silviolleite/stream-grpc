@@ -1,50 +1,47 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/jinzhu/gorm"
-	"github.com/segmentio/kafka-go"
-	_ "github.com/segmentio/kafka-go/snappy"
+	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"stream-grpc/config"
 	"stream-grpc/models"
 )
 
 func main() {
-	brocker := fmt.Sprintf("%s:%s", config.Config.BrockerUrl, config.Config.BrockerPort)
-	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:   []string{brocker},
-		GroupID:   config.Config.GroupID,
-		Topic:     config.Config.Topic,
-		MinBytes:  10e3, // 10KB
-		MaxBytes:  10e6, // 10MB
+	c, err := kafka.NewConsumer(&kafka.ConfigMap{
+		"bootstrap.servers": config.Config.BrockerUrl,
+		"group.id":          "machines",
+		"auto.offset.reset": "earliest",
 	})
-	fmt.Println("Cosumer is running...")
-	for {
-		m, err := r.FetchMessage(context.Background())
-		if err != nil {
-			fmt.Println("Error to fetch message")
-			fmt.Printf("Error: %v", err)
-			break
-		}
 
-		// save on database
-		SaveTransactions(m.Value)
-
-		err = r.CommitMessages(context.Background(), m)
-		if err != nil {
-			fmt.Println("Error to commit message")
-			fmt.Printf("Error: %v", err)
-			break
-		}
-	}
-
-	err := r.Close()
 	if err != nil {
-		fmt.Println("Error on Close reader")
-		fmt.Printf("Error: %v\n", err)
+		panic(err)
 	}
+
+	err = c.SubscribeTopics([]string{"transactions", "^aRegex.*[Tt]opic"}, nil)
+	if err != nil {
+		fmt.Printf("Error on subscribe topics: %v\n", err)
+	}
+	defer c.Close()
+
+	fmt.Println("Consumer is listening...")
+
+	for {
+		msg, err := c.ReadMessage(-1)
+		if err == nil {
+			fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
+			// save on database
+			SaveTransactions(msg.Value)
+		} else {
+			// The client will automatically try to recover from all errors.
+			fmt.Printf("Consumer error: %v (%v)\n", err, msg)
+		}
+	}
+
+
+
 }
 
 func SaveTransactions(value []byte)  {
@@ -72,7 +69,7 @@ func SaveTransactions(value []byte)  {
 			Date:        transactions.Date,
 			Description: transactions.Description,
 		}
-		fmt.Printf("Insert data %v\n", transaction)
+		fmt.Printf("Inserting data %v\n", transaction)
 		if err := db.FirstOrCreate(&transaction).Error; err != nil {
 			fmt.Println("Error to save data")
 			fmt.Printf("Error: %v\n", err)
