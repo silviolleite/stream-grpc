@@ -29,10 +29,20 @@ Create a copy of `.env.example` renaming it to `.env` and fill the environment v
 
 Package [grpc](https://godoc.org/google.golang.org/grpc) implements an RPC system called gRPC.
 
-### Kafka-go
+### confluent-kafka-go.v1
 
-It provides both low and high level APIs for interacting with Kafka, mirroring concepts and implementing interfaces of the Go standard library to make it easy to use and integrate with existing software.
-[kafka-go](github.com/segmentio/kafka-go)
+It is Confluent's Golang client for Apache Kafka 
+[kafka-go](https://github.com/confluentinc/confluent-kafka-go)
+
+This client for Go depends on `librdkafka`, so you either need to install `librdkafka`
+through your OS/distributions package manager.
+
+- For Debian and Ubuntu based distros, install `librdkafka-dev` from the standard
+repositories or using [Confluent's Deb repository](http://docs.confluent.io/current/installation.html#installation-apt).
+- For Redhat based distros, install `librdkafka-devel` using [Confluent's YUM repository](http://docs.confluent.io/current/installation.html#rpm-packages-via-yum).
+- For MacOS X, install `librdkafka` from Homebrew. You may also need to brew install pkg-config if you don't already have it. `brew install librdkafka pkg-config`.
+- For Alpine: `apk add librdkafka-dev pkgconf`
+- confluent-kafka-go is not supported on Windows.
 
 ### GORM
 
