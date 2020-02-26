@@ -1,20 +1,18 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"github.com/segmentio/kafka-go"
+	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"stream-grpc/config"
-	"time"
 )
 
 func main() {
-	brocker := fmt.Sprintf("%s:%s", config.Config.BrockerUrl, config.Config.BrockerPort)
-	w := kafka.NewWriter(kafka.WriterConfig{
-		Brokers: []string{brocker},
-		Topic:   config.Config.Topic,
-		Balancer: &kafka.LeastBytes{},
-	})
+//	brocker := fmt.Sprintf("%s:%s", config.Config.BrockerUrl, config.Config.BrockerPort)
+//	w := kafka.NewWriter(kafka.WriterConfig{
+//		Brokers: []string{brocker},
+//		Topic:   config.Config.Topic,
+//		Balancer: &kafka.LeastBytes{},
+//	})
 	transactions := []byte(`{
 		"transactions": [
 			{
@@ -36,24 +34,58 @@ func main() {
 				"amount": "1400"
 			}
 	]}`)
+//
+//	message := kafka.Message{
+//		Key:   []byte("transactions"),
+//		Value: transactions,
+//		Time:  time.Now(),
+//	}
+//	err := w.WriteMessages(context.Background(), message)
+//	if err != nil {
+//		fmt.Println("Error to push a new message")
+//		fmt.Printf("Error: %v\n", err)
+//	}else {
+//		fmt.Println("Message was published")
+//	}
+//
+//	err = w.Close()
+//	if err != nil {
+//		fmt.Println("Error on Close writer")
+//		fmt.Printf("Error: %v\n", err)
+//	}
 
-	message := kafka.Message{
-		Key:   []byte("transactions"),
-		Value: transactions,
-		Time:  time.Now(),
-	}
-	err := w.WriteMessages(context.Background(), message)
+	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": config.Config.BrockerUrl})
 	if err != nil {
-		fmt.Println("Error to push a new message")
-		fmt.Printf("Error: %v\n", err)
-	}else {
-		fmt.Println("Message was published")
+		panic(err)
 	}
 
-	err = w.Close()
+	defer p.Close()
+
+	// Delivery report handler for produced messages
+	go func() {
+		for e := range p.Events() {
+			switch ev := e.(type) {
+			case *kafka.Message:
+				if ev.TopicPartition.Error != nil {
+					fmt.Printf("Delivery failed: %v\n", ev.TopicPartition)
+				} else {
+					fmt.Printf("Delivered message to %v\n", ev.TopicPartition)
+				}
+			}
+		}
+	}()
+
+	// Produce messages to topic (asynchronously)
+	topic := "transactions"
+
+	err = p.Produce(&kafka.Message{
+		TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+		Value:          transactions,
+	}, nil)
 	if err != nil {
-		fmt.Println("Error on Close writer")
-		fmt.Printf("Error: %v\n", err)
+		fmt.Printf("Produce error: %v\n", err)
 	}
 
+	// Wait for message deliveries before shutting down
+	p.Flush(15 * 1000)
 }
